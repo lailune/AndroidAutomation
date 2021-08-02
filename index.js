@@ -17,6 +17,13 @@ const xpath = require('xpath')
 const aaUtils = require('./utils');
 
 class AndroidAutomation {
+
+    /**
+     * Keys codes
+     * @type {{KEYCODE_ALT_RIGHT: string, KEYCODE_SYM: string, KEYCODE_AT: string, KEYCODE_DPAD_UP: string, KEYCODE_MINUS: string, KEYCODE_ENVELOPE: string, KEYCODE_COMMA: string, KEYCODE_DPAD_DOWN: string, KEYCODE_EQUALS: string, KEYCODE_Y: string, KEYCODE_DPAD_LEFT: string, KEYCODE_Z: string, KEYCODE_W: string, KEYCODE_X: string, KEYCODE_U: string, KEYCODE_UNKNOWN: string, KEYCODE_V: string, KEYCODE_S: string, KEYCODE_T: string, KEYCODE_SHIFT_LEFT: string, TAG_LAST_KEYCODE: string, KEYCODE_VOLUME_UP: string, KEYCODE_LEFT_BRACKET: string, KEYCODE_PLUS: string, KEYCODE_BACKSLASH: string, KEYCODE_CLEAR: string, KEYCODE_ENDCALL: string, KEYCODE_GRAVE: string, KEYCODE_HEADSETHOOK: string, KEYCODE_POWER: string, KEYCODE_POUND: string, KEYCODE_DPAD_CENTER: string, KEYCODE_NUM: string, KEYCODE_EXPLORER: string, KEYCODE_SLASH: string, KEYCODE_BACK: string, KEYCODE_1: string, KEYCODE_2: string, KEYCODE_SHIFT_RIGHT: string, KEYCODE_SEMICOLON: string, KEYCODE_0: string, KEYCODE_DEL: string, KEYCODE_CALL: string, KEYCODE_NOTIFICATION: string, KEYCODE_VOLUME_DOWN: string, KEYCODE_RIGHT_BRACKET: string, KEYCODE_SPACE: string, KEYCODE_I: string, KEYCODE_STAR: string, KEYCODE_J: string, KEYCODE_G: string, KEYCODE_PERIOD: string, KEYCODE_H: string, KEYCODE_E: string, KEYCODE_F: string, KEYCODE_C: string, KEYCODE_D: string, KEYCODE_Q: string, KEYCODE_R: string, KEYCODE_O: string, KEYCODE_P: string, KEYCODE_M: string, KEYCODE_ENTER: string, KEYCODE_N: string, KEYCODE_K: string, KEYCODE_L: string, KEYCODE_SOFT_RIGHT: string, KEYCODE_9: string, KEYCODE_APOSTROPHE: string, KEYCODE_MENU: string, KEYCODE_TAB: string, KEYCODE_7: string, KEYCODE_FOCUS: string, KEYCODE_HOME: string, KEYCODE_8: string, KEYCODE_ALT_LEFT: string, KEYCODE_5: string, KEYCODE_6: string, KEYCODE_CAMERA: string, KEYCODE_3: string, KEYCODE_SEARCH: string, KEYCODE_4: string, KEYCODE_A: string, KEYCODE_B: string, KEYCODE_DPAD_RIGHT: string}}
+     */
+    KEY_CODE = aaUtils.KEY_CODES;
+
     constructor(options) {
         options = {...options, sdkPath: process.env.ANDROID_SDK_ROOT, tempPath: '.'}
         this.sdkPath = options.sdkPath;
@@ -100,6 +107,44 @@ class AndroidAutomation {
      */
     async tapTouch(x, y) {
         let tapResult = await exec(`${this.adb} shell input tap ${x} ${y}`);
+    }
+
+    /**
+     * Write text to form
+     * @param {string} text
+     * @returns {Promise<void>}
+     */
+    async writeText(text) {
+
+        let tapResult = await exec(`${this.adb} shell input text '${JSON.stringify(text)}'`);
+    }
+
+    /**
+     * Send key event
+     * @param {string|number} keyCode Key code from KEY_CODES
+     * @returns {Promise<void>}
+     */
+    async key(keyCode) {
+
+        let tapResult = await exec(`${this.adb} shell input keyevent ${keyCode}`);
+    }
+
+    /**
+     * Wait for selector available
+     * @param {string} selector
+     * @returns {Promise<SelectorResult[]>}
+     */
+    async waitForSelector(selector) {
+        let selectorResult;
+        while (true) {
+            selectorResult = await this.$(selector);
+
+            if(selectorResult.length !== 0) {
+                return selectorResult;
+            }
+
+            await aaUtils.wait();
+        }
     }
 }
 
