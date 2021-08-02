@@ -24,6 +24,12 @@ class AndroidAutomation {
      */
     KEY_CODE = aaUtils.KEY_CODES;
 
+    /**
+     * Simple async wait
+     * @type {(function(*=): Promise<unknown>)|*}
+     */
+    wait = aaUtils.wait;
+
     constructor(options) {
         options = {...options, sdkPath: process.env.ANDROID_SDK_ROOT, tempPath: '.'}
         this.sdkPath = options.sdkPath;
@@ -145,6 +151,25 @@ class AndroidAutomation {
 
             await aaUtils.wait();
         }
+    }
+
+    /**
+     * Run app by package id
+     * @param packageId
+     * @param intent
+     * @returns {Promise<void>}
+     */
+    async runApp(packageId, intent = 'android.intent.category.LAUNCHER') {
+        let runResult = await exec(`${this.adb} shell monkey -p ${packageId} -c ${intent} 1`);
+    }
+
+    /**
+     * Force stop app by package id
+     * @param packageId
+     * @returns {Promise<void>}
+     */
+    async forceStop(packageId) {
+        let stopResult = await exec(`${this.adb} shell am force-stop  ${packageId}`);
     }
 }
 
